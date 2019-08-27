@@ -1,0 +1,42 @@
+Uses a factory class to create objs.
+Pro:
+Client does not need to know the implementation of any specific products, it just needs to know the common
+interface. It isolates each concrete class.
+Con:
+Clients may not be able to call any specific function of any concrete class.
+
+Implementation
+
+
+Interface/Abstract class Factory
+{
+  Product CreateProduct();
+}
+
+class AFactory implements/extends Factory
+{
+  Product CreateProduct()
+  {
+    return new AProduct();
+  }
+}
+
+class bFactory implements/extends Factory
+{
+  Product CreateProduct()
+  {
+    return new BProduct();
+  }
+}
+
+
+Interface Product
+{
+
+}
+
+class AProduct implements/extends Product
+{}
+
+class BProduct implements/extends Product
+{}

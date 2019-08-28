@@ -1,0 +1,43 @@
+There is a director and a builder.
+Director is a ordinary class which will involve an abstract build to do things.
+This abstract will be concrete builder at runtime and do things accordingly.
+
+Abstract class GameBuilder
+{
+      virtural buildPlayer();
+      virtural buildMonster();
+      virtural Game getGame();
+}
+
+
+class NinjaGameBuilder
+{
+    Game g;
+    buildPlayer()
+    {
+      calling some private functions to create ninja.
+      g.add(ninja);
+    }
+    
+    buildMonster();
+    {
+      calling some private functions to create ninjaMonster.
+      g.add(ninjaMonster);
+    }
+    
+    Game getGame()
+    {
+      return g;
+    }
+}
+
+
+Game GameCreater::createGame(GameBuilder b)
+{
+  b.buildPlayer();
+  b.buildMonster();
+  return b.getGame();
+}
+
+In Builder classs, you are able to construct objects step by step with different builder. And to add a new things,
+you just need to create a new builder.

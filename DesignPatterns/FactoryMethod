@@ -1,0 +1,24 @@
+Factory method is often used with abstract factory together.
+
+
+
+class Creator
+{
+  Product create(int a)
+  {
+    if a == 1
+        return AProduct
+    if a == 2
+        return BProduct
+  }
+}
+
+
+class QCreator
+{
+  Product create(int a)
+    if a == 1
+      return QProduct
+    else 
+      return AProduct
+}

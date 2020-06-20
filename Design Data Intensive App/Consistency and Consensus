@@ -1,0 +1,10 @@
+Linearizability: to make a system appear as if there is only one copy of the data.
+
+CAP:
+Consistency, availability, partition tolerance
+
+When network failure happened, so network is partitioned, you need to choose between availability and consistency. A)
+if available, then we have two sets of node work independenly, so inconsistent. B) if consistent, then they have to stop working.
+CAP theorem is only for one kinda of failure(network is partitioned), there are other failures also, dealys, dead nodes…
+
+Zookeeper is usually for small amount of metadata. E.g. which partition goes to which node…

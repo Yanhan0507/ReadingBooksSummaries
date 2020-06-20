@@ -1,0 +1,8 @@
+Clock is not reliable.
+Time of a day, may periodically sync to network time protocol NTP server (since epoch time). It may jump back sometimes.
+Monotonic clock, a time since your machine starts or something, only increasing. Duration usually measured by this kinda clock.
+
+GC(stop of world) is an good example that any thread can be paused at anytime.
+
+Byzantine faults:
+Sometimes some worker may tend to lie.

@@ -1,0 +1,35 @@
+Normalization vs de-normalization:
+
+Normalization:
+Data consistent in different places. (it cant be washington in one and wa in the other).
+No duplication so save some space.
+Easier to refactor/rename in the future as you only need to change one place.
+
+De-normalization:
+Quicker as less join.
+
+Dimension table
+Product table: Product id, product name, description
+Region table: region id, region name
+Fact table(sales table)
+Product id, region id, quantity
+
+Customer state purchased_item
+Henry        WA     Phone
+
+It can be changed to 
+Customer state purchased_item
+1             20        66
+
+
+SQL VS NOSQL(not only sql)
+
+SQL: ACID and if your thing has a schema. Better join support so it can handle multiple to multiple relation better.
+(one person has job 1, job 2, job 3; job1 has person a, b, c). Has fixed schema(schema on write, you have to write
+data according to certain schema). Multiple to multiple relation.
+
+NO-SQL: schemaless(schema on read, during read, you will/have to know the schema and app logic have to parse the
+document/value, but during write schema does not matter), schema may change and not fixed. Weak join support and
+you may need to handle join in your own application. More scalable (by nature, key value pair, it’s horizontal scaling).
+One to multiple relation.
+

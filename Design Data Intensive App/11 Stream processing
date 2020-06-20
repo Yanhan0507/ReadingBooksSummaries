@@ -1,0 +1,30 @@
+(message queue)
+Producer sends a msg to queue, waits broker(msgQ) confirm it has received it but not waiting for it to be consumed.
+
+JMS/AMQP based msg q:
+Message Queue waits for ack from consumer. Then msg will be removed.
+Can be paralleled at message basis.
+
+If order matters it could be bad:
+M1 m2 m3, (three messages) and 2 consumers.
+M1 -> C1	 M3 -> C1    M2 -> C1
+	M2 -> C2 (c2 failure then broker redeliver the msg to C1, M2 got processed later than M3)
+See p 446 example
+
+Log based msg Q:
+Each topic can have multiple partition(each partition can have replication as well)  but each partition only one consumer
+which has an offset, and it will only process message after that. Usually  no deletion until no storage space.. 
+Can be paralleled at partition basis, less granular. One super small msg can stuck all subsequent msg.
+
+
+Kafka is based on that.
+
+Fault tolerance:
+Make each sec/hour as a micro-benching, and redo it if failed.
+
+Log based Msg Q is similar to db. Db is more like a view(final state of each variable, which log based msg q is immutable
+so it has more data. E.g. something like a student register a course then cancel it, this might be useful even though final
+state is he does not register it.)
+
+Exactly once semantics. 
+

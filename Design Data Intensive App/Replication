@@ -1,0 +1,39 @@
+Replicated for quite a few reasons:
+Scalability, high availability, better performance(could be geographically closer to users), better performance.
+Consistency.
+
+The information from one node to others(e.g. Leader to replica), can be:
+1 copy entire stmt. But it’s slow to execute entire plan with plan generation, optimization. Also, if a query has
+select now(), select rand(), then it wont work.
+2 copy physical log, e.g., what to write to which row. Good, but heavily coupled with storage engine, if we want
+to upgrade DB at some point, we can not update each node one by one(rolling upgrade). We will need to bring down
+the entire system, and upgrade all of them, and then start.
+3 copy logical log. That’s better usually. Row level information. 
+
+One leader, multiple leader, leaderless
+1 one leader - write to one, and pass read to followers. No write conflict, simpler. Read heavy scenario. Read could
+get old data. - you need to think of if it’s fine to get old data. 
+
+A couple of examples:
+	A write after read from same user: if a user update a profile and then see the profile without his change, that would
+  be awkward. One way - read request from owner(e.g. Only owner can change his profile) goes to primary still. 
+	Monotonic read(Repeatable read) - if a user access same page several times, sometimes it see a page with A sometimes not.
+  This case, it will be awkward also. One solution is to route read requests of one user always to the same backup/secondary
+  (probably the closest one - based on dns, or based on hash code of the user name).
+
+Write request can be async or sync. Total sync it’s too hard, becoz if any node down or slow, will pause the write request.
+But we have do a semi-sync that, leader still forward write requests to all replicas but as long as one succeeds, we return.
+That way we can sure no data loss even though primary is gone.
+
+
+2 Multi leader - that is complicated to deal with write conflict.
+Advantage is that we can write to multiple nodes thus write would be quicker.
+
+3 leader less: write can succeed when it write to w nodes successfully. R can succeed if r nodes return successfully.
+W + R > n  quorum can be met.
+But in this case some nodes may be behind. Say for some reason, write only writes to W nodes, the other n - w does not have it.
+Though read can still get latest record becoz it will read r. But in the case of failure, these nodes will be very behind so it
+may suffer data loss. Two ways to address 1) when reading, updating other tables with latest records also. But for cold data,
+it can be very behind. 2) there is a background process to do so.
+
+

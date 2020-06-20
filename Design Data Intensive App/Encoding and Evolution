@@ -1,0 +1,9 @@
+Forward compatibility: old code, new data. E.g. you have some processes with old code and some with new code
+during rolling upgrade, so new code may produce records with new schema that time old code needs to know what
+to do(probably just skip and leave it as is) with new data.
+Backward compatibility: new code, old data. New process needs to know what to do with old data.
+
+Encoding, json, xml -> human readable but cost more space. (int and string cannot be differentiated. You need additional tag.)
+Binary format:(e.g. avro) not human readable, save space, and clear backward/forward compatibility.
+
+REST: using http protocol. Use url to access data (get/post/delete/put). Design philosophy.

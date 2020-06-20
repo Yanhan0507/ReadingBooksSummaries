@@ -1,0 +1,14 @@
+The output of stream/batch processing is usually full text search indexes, materialized views, aggregated metrics,
+recommendation systems.
+
+Lambda architecture:
+Stream processing: provide a roughly accurate but quick results
+Batch processing: which runs periodically to provide a correct results
+
+Database is like a final state/view.
+Immutable log is having more info, e.g. A signed up for X and then cancelled X. this info could be useful also.
+
+Write and read boundary: （different tradeoff）
+E.g. (each write update index, and then search can base on index)
+(each write can update the results of all of potential queries, so each query can be very fast but write can be impractically slow)
+(each write can update index and a few frequently queried materialized view.)

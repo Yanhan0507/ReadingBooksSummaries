@@ -1,0 +1,29 @@
+TPCDS: 99 queries  OLTP
+TPCH: 22 queries OLAP
+TPCE: OLTP
+Power run order: run queries one by one
+
+OLTP: huge number of queries, each query is small/lightweight, but response time needs to be quick,
+important scenario, you cannot lose any of record. Queries usually issued by real customers.
+
+OLAP: for analytical workload, number of queries is small, but each query is big, column store might
+be used as usually we will only select a few columns or aggregated statistics about several rows not
+all rows of fact table, fact table can be very huge with hundreds of rows. (fact table and dimension
+table. Fact tables is huge which may have hundreds of columns and referencing all dimension table.
+E.g. product id = 1001 ,  1001 - coke - black - $2.5 ) some columns are very relevant, (becoz queries
+would be select salary, age from table not select * from table where uid = 3), easier to compress.
+(a ypical query can be to search what product are usually bought with A together). Queries usually issued
+by data scientists.
+
+HTAP: Hybrid transactional/analytical processing
+
+OLTP: B Tree - LSM(log structured merge) tree. Btree is read faster. LSM is write fast as it’s writing
+to memory and then merge. But LSM’s read can be very slow as it needs to go back from memory then last segment,
+to the very first segment 
+
+Materialized view makes more sense in OLAP as it add some write overhead but it can create a view for something like,
+count, max, min which is something OLAP cares a lot.
+
+Branching factor, (each node many elements. Branching factor: 500, lvl 4, 256. Each page 4kb.
+4kb * 500^6)
+

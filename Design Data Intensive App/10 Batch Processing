@@ -1,0 +1,18 @@
+Batch job operates on a fixed set of data. (sort operation does not make sense if you data keep coming like stream processing).
+Throughput is more important than response time.
+
+Map reduce job:
+Mapper: read records and extract key value pair from each record. Call the mapper function.
+Shuffle:
+Then each mapper partition its output based on reducer, and sort each partition in a output file in a local disk.
+Reducer: Then reducer get records from each of mapper and call reducer function.
+
+Broadcast hash join:
+Small table broadcast to all nodes, and hash distributed the bigger table.
+
+Partition hash join:
+Move same key for left and right side into same node.(only works if they have same number of partitions). This way u can load
+smaller number of records to hash table. 
+
+Spark: dont always need to materialize. You have many different operators and one after another, so it has global knowledge to
+do the optimization. 

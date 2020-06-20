@@ -1,0 +1,90 @@
+Mysql default setting is repeatable read.
+MSSQL read committed.
+
+Read committed level:
+Originally table t(a int, b int) has one record.
+
+Connection1:
+BEGIN TRAN
+UPDATE t set a = 41 where b = 42
+
+Connection2:
+BEGIN TRAN
+SELECT * FROM t WHERE b = 42
+
+Update first, then select, will block select if using lock. (e.g. mssql-server)
+
+If changing to repeatable read, then select will even block write as the shared lock wont be released until the end of txn.
+(SELECT first from conn1, then update from conn2, second one will be blocked now)
+
+If changing to snapshot, then none of above cases will block each other.
+(and you can still achieve repeatable read.)
+
+ACID:
+MYSQL: REPEATABLE READ
+MSSQL: READ COMMITTED
+
+Atomic -> all or nothing. Either an entire txn is committed or nothing happened. If partial write finish and then something
+wrong happened, then the previous written part would be rolled back.
+(done by log).
+
+Consistent -> From one consistent state, and run a consistent txn, then in the end, it will be another consistent state.
+(consistent is usually a property of app developer, while A, I, D are properties of DB). say bank balance never goes below zero.
+(you have 100 dollar before, and then you transfer 50 and 50 is less than, so you will end up with a valid state that has 50 more)
+
+Isolation -> they are properly isolation, two queries are executing as if they were executing alone. (done by lock or MVCC)
+
+Durable -> once a txn is committed. U wont need to worry about data loss. In single node DB, it usually means written into disk.
+In distributed DB scenario, that usually means write to another backup.
+
+Isolation levels:
+
+Read uncommitted: dirty read. The query wont even try to issue a shared lock. So it can read some data which is updating by some
+other on-going and uncommitted txns
+Dirty read: read something from uncommitted txn
+Dirty write: overwrite something that has not been committed. 
+
+Read committed(default): a shared lock is issued. And the shared lock is released at the end of stmt, not end of txn.
+So when we read same record multiple times during a txn, the value could be different.
+
+Repeatable read: (many db implemented that by mvcc. In sql server, if snapshot isolation is on, we will use versioning,
+otherwise 2 phase lock)
+2 phase locking(lock is acquired during execution, but released at the end of txn) - may have a deadlock. We have a deadlock
+detector and rolls back one of these two txnsd +.
+Depending on if snapshot isolation is enabled:
+shared lock is issued until the Txn is finished. So you can expect same select results except phantom read(insert) becoz this
+is shared lock on rows which prevent updating from happening but insertion can still happen.
+Read the thing based on the version of beginning of the isolation.
+
+Repeatable read may have phantom read. (you have a select query, and based on that results, you have some update query,
+a new record may be inserted already so the select query results may have changed.)
+serializable: a range lock/table lock is issued and no insert can happen.
+
+Versioning and locking:
+Customers may experience different behaviors due to these two different implementations, becoz their business logic needs
+to change. E.g. you have two update.
+Versioning: it would fail when commiting one transaction, so retry is needed from app side
+Locking: one update has to wait for another to finish. 
+
+Create table t (a int)
+Insert into t values (42)
+Session 1:
+	Begin tran
+		Select * from a = 2
+		Update t set a =42 where a = 1
+
+Session 2:
+	Begin tran
+		Select * from a = 1
+		Update t set a = 41 where a = 2
+In locking case, one of query may wait until the other one finished.
+In  MVCC case, one of query will fail as when the latter one tries to commit,
+it will notice that one query may need to be rolled back(becoz stale read of a=1 as a=1 has been updated)
+
+Select for update to take an exclusive lock directly which is a trick. Select for update will work in a way
+that no existing rows can be modified by other txns(e.g. Increment a count by 2 concurrent queries.
+So X can be X+2 by the end if both 2 queries using select for update. If they are using select only,
+it may be X+ no matter versioning or locking)mn . But it wont work that if the query result is changed
+becoz of a newly inserted row but not updated row(later a row is inserted wont be prevented. So phantom read cant be prevented.)
+
+

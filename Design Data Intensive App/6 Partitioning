@@ -1,0 +1,41 @@
+Partitioning
+Why: scalability, to provide predictable performance.
+
+If data is not partitioned evenly, then we call it skewed:
+1 partition by range - not evenly distributed. In each range, data is usually sorted.
+(0-50 -> partition 1. 51-100 -> partition 2) . load may not be evenly distributed(hot spot), but serves range queries better.
+
+2 partition by hash key - evenly, but not good for range operation as range queries will be sent to all partitions.
+Cassandra is having something called compound primary key, which consists of multiple parts, first part is partition key,
+others are sorting order. {user id, time-stamp} that way u can get all users data in one partition and sorted order by time.
+
+Some workloads are skewed by nature. Say a user has many records that we can add a prefix random number to his/her user id.
+But clients may need to remember a set of special users so it can handle it differently when reading. (e.g. adding random
+number from 1-100 to lady gaga’s user id so that hsah code would be different from 1ladygaga, 2lady gaga...)
+
+Secondary index in partition:
+	Secondary in each local partition. Simpler, but queries filter by secondary index still needs to go to all partitions.
+  (tail latency amplification as scan secondary index scan is very slow)
+	Global secondary. (secondary index is partition by it’s index column as well, and customers go to that secondary index
+  partition know which partitions have info they want and then send queries to these partitions.)
+
+Rebalancing:
+	No down time
+	Copy minimal required data to network
+	After adding or removing one node, data should still be fairly even
+Direct hashing is not good. (hash(key) = 123456. 10 nodes, ->6 ,11 nodes ->3, 12nodes->0 when ever a new node added,
+he needs to be moved)
+
+Fixed number of partitions:
+	20 partitions, 4 nodes, each has 5, then a new is added. So each partition gives one to the new node. So each has 4 again.
+  We need to know a fixed number of partitions(the maximal number of nodes possible) at the beginning. 
+It could be bad as one partition could be really hot spot that all data might be still going to one node.
+
+Dynamic partitioning:
+	Set a range for each partition(e.g. 5g - 10g). Automatically split if it’s larger or smaller. Then a new node is added,
+  some partitions can be moved to the new node.
+
+Request routing:
+	1 clients to contact any node to try
+	2 to a coordinator first (zoo keeper maintains a map of that)
+	3 clients required to remember that info.	

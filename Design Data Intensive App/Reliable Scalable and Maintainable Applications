@@ -1,0 +1,27 @@
+When estimating traffic, ask if it’s fast growing service: * 2 or *3
+
+Disk knowledge:
+RAID: redundant array of inexpensive disk
+Raid 0: striping. For striping. Data evenly across two or more disks. - for perf mainly
+A1  A2
+A3  A4
+Raid 1: mirroring. two exact same copy of data in two disks. - data redundancy. Read is better.
+A1    A1
+A2    A2
+A3    A3
+A4    A4
+
+Raid 5:  (One parity block), say, 5 drives, one is for redundancy based on parity. (1/5  drive is for redundancy while raid has to pay half of drives for the same thing) and any ONE drive can die without losing data)
+A1 A2 A3 A4 AP   
+
+Raid 6:   (two parity blocks) and any TWO drive can data without losing data
+A1 A2 A3 AP AP1
+5,6 may punish write a bit as it has to compute parity block and write to it.
+
+Example of SLO 9995: median response time is 200ms, 99% percentile response time is 1s is defined as up/available.
+And 99.95 percent of time the system is available/up.
+High percentile customer is valuable sometimes as at amazon they would be the customers which checkout most stuff.
+So tail latency matters.
+Tail latency amplification: if a request to go to all backends, and only a small number of backend receive requests
+is slow for each backend sever(tail latency), then overall requests would be very slow, called tail latency amplification. 
+Proportionally increase.
